@@ -286,8 +286,8 @@ class TroyScene extends Phaser.Scene {
     this.truthHorse.setPosition(this.horse.x, this.horse.y).setScale(horseScale).setAngle(visualAngle)
 
     const pullerOffsetX = portrait
-      ? Phaser.Math.Linear(width * 0.26, width * 0.16, depth)
-      : Phaser.Math.Linear(width * 0.21, width * 0.115, depth)
+      ? Phaser.Math.Linear(width * 0.3, width * 0.19, depth)
+      : Phaser.Math.Linear(width * 0.315, width * 0.2, depth)
     const pullerOffsetY = portrait
       ? Phaser.Math.Linear(-height * 0.055, -height * 0.035, depth)
       : Phaser.Math.Linear(-height * 0.045, -height * 0.025, depth)

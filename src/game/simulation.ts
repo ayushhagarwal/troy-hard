@@ -120,27 +120,29 @@ export class RunSimulation {
     }
 
     if (this.inspectionPhase === "active") {
-      const movement = Math.max(0, this.velocity - 0.12) * 14
-      const wobble = Math.max(0, Math.abs(this.pitch) - 4) * 0.95
-      const weightNoise = Math.max(0, Math.abs(this.balance) - 0.18) * 11
-      const shiftingNoise = Math.abs(this.balanceTarget - this.balance) * 22
-      const unbracedNoise = (1 - this.braceLoad) * 24
+      // Inspections punish obvious movement, not small corrections. A player
+      // who braces and counterbalances should reliably leave with very little
+      // suspicion, even on a rough terrain crest.
+      const movement = Math.max(0, this.velocity - 0.18) * 8
+      const wobble = Math.max(0, Math.abs(this.pitch) - 8) * 0.55
+      const weightNoise = Math.max(0, Math.abs(this.balance) - 0.55) * 7
+      const shiftingNoise = Math.abs(this.balanceTarget - this.balance) * (input.brace ? 6 : 16)
+      const unbracedNoise = (1 - this.braceLoad) * 22
       const exposure = movement + wobble + weightNoise + shiftingNoise + unbracedNoise
       const firstPracticeInspection = this.config.mode === "practice" && this.inspectionIndex === 0
       const practiceGrace = firstPracticeInspection ? 0.3 : 1
       this.suspicionPct = Math.min(100, this.suspicionPct + exposure * (dtMs / 1_000) * practiceGrace)
 
       const settled = input.brace
-        && this.braceLoad >= 0.66
-        && Math.abs(this.pitch) <= 9
-        && Math.abs(this.pitchVelocity) <= 3.5
-        && Math.abs(this.balanceTarget - this.balance) <= 0.16
-      // Practice demonstrates the checkpoint once without trapping a new
-      // player. Every later inspection remains stopped until they do it right.
-      const practiceDemonstrationComplete = firstPracticeInspection
-        && this.inspectionTimerMs >= point.activeMs + 1_750
+        && this.braceLoad >= 0.56
+        && Math.abs(this.pitch) <= 15.5
+        && Math.abs(this.pitchVelocity) <= 10
+      // A clean brace clears at the normal duration. A rough attempt gets a
+      // short extra look, but never becomes an impossible permanent lock.
+      const maximumInspectionMs = point.activeMs + (firstPracticeInspection ? 600 : 950)
 
-      if (this.inspectionTimerMs >= point.activeMs && (settled || practiceDemonstrationComplete)) {
+      if (this.inspectionTimerMs >= point.activeMs && (settled || this.inspectionTimerMs >= maximumInspectionMs)) {
+        if (settled) this.suspicionPct = Math.max(0, this.suspicionPct - 5)
         this.inspectionPhase = "idle"
         this.inspectionTimerMs = 0
       }
