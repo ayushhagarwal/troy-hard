@@ -75,7 +75,7 @@ function GameApp() {
   }, [])
 
   useEffect(() => {
-    const syncAudioPause = () => audioRef.current?.setPaused(settingsOpen || playerPaused || screen !== "game" || document.hidden)
+    const syncAudioPause = () => audioRef.current?.setPaused(settingsOpen || playerPaused || screen === "title" || document.hidden)
     syncAudioPause()
     document.addEventListener("visibilitychange", syncAudioPause)
     return () => document.removeEventListener("visibilitychange", syncAudioPause)
@@ -191,11 +191,11 @@ function GameApp() {
             onSnapshot={(next) => {
               setSnapshot(next)
               if (Math.abs(next.balance) > 0.22) setLearnedBalance(true)
-              audioRef.current?.setIntensity(next.inspection.phase === "active" ? "alarm" : next.inspection.phase === "telegraph" ? "suspicion" : next.velocity > 0.15 ? "pull" : "idle")
+              audioRef.current?.updateGameplay(next)
             }}
             onFinish={finishRun}
             onBrace={() => { setLearnedBrace(true); audioRef.current?.sfx("brace") }}
-            onRelease={() => undefined}
+            onRelease={() => audioRef.current?.sfx("release")}
             onInspect={() => audioRef.current?.sfx("inspect")}
             onTensionCritical={() => audioRef.current?.sfx("rope")}
             onPauseChange={setPlayerPaused}
