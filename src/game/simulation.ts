@@ -62,6 +62,9 @@ export class RunSimulation {
     // The Trojans stop the cart for an inspection. The run only resumes once
     // the hidden crew has actively braced and settled the load.
     if (this.inspectionPhase === "active") targetSpeed = Math.min(targetSpeed, 0.015)
+    // Bracing makes the shifting weight safe and quiet, but the crew digging
+    // into the frame acts like a brake. Releasing restores the full Trojan pull.
+    targetSpeed *= 1 - this.braceLoad * 0.34
     const acceleration = (targetSpeed - this.velocity) * 2.15 - terrain.slope * 0.12
     this.velocity = Math.max(0, Math.min(1.82, this.velocity + acceleration * dt))
     this.progressM = Math.min(TRACK_LENGTH_M, this.progressM + this.velocity * dt)

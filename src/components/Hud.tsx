@@ -25,6 +25,8 @@ export function Hud({ snapshot, learnedBrace, learnedBalance, onSettings }: HudP
       ? "ROPE STRAIN · CENTER THE HIDDEN CREW"
       : tipping
         ? `COUNTER THE SLOPE · SHIFT ${counterDirection}`
+      : braced
+        ? "BRACING SLOWS THE CART · RELEASE FOR SPEED"
       : !learnedBrace
         ? "HOLD SPACE OR PRESS TO BRACE"
         : !learnedBalance
@@ -74,9 +76,9 @@ export function Hud({ snapshot, learnedBrace, learnedBalance, onSettings }: HudP
         </div>
       ) : null}
       {instruction ? <p className={`hud-instruction ${ropeCritical || tipping || snapshot.inspection.phase === "active" ? "is-danger" : ""}`}>{instruction}</p> : null}
-      <div className={`control-guide ${braced ? "is-braced" : ""}`} aria-label={`The Trojans pull automatically. Hidden crew ${braced ? "braced and quiet" : "loose"}. Noise ${Math.round(snapshot.noisePct)} percent.`}>
+      <div className={`control-guide ${braced ? "is-braced" : ""}`} aria-label={`The Trojans pull automatically. Hidden crew ${braced ? "braced and quiet; cart slowed" : "loose; cart at full pull"}. Noise ${Math.round(snapshot.noisePct)} percent.`}>
         <span>TROJANS PULL <i aria-hidden="true">→ UPHILL INTO THE GATE</i></span>
-        <strong>{braced ? "BRACING · QUIET" : "HOLD SPACE / PRESS · BRACE"}</strong>
+        <strong>{braced ? "BRACING · QUIET · CART SLOWED" : "HOLD SPACE / PRESS · BRACE"}</strong>
         <small>SLIDE OR A / D · SHIFT HIDDEN CREW <b>{Math.round(snapshot.noisePct)}% NOISE</b></small>
       </div>
       <button className="hud-settings" onClick={onSettings} aria-label="Pause and open settings"><SettingsIcon /></button>

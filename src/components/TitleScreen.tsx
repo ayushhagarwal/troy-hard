@@ -41,7 +41,7 @@ export function TitleScreen(props: TitleScreenProps) {
         <GameButton variant="primary" className="begin-button" onClick={props.onBegin}>
           {isDuel ? "ACCEPT THE CHALLENGE" : "BEGIN THE INFILTRATION"}
         </GameButton>
-        <p className="title-instruction"><strong>The Trojans pull automatically.</strong> Hold <kbd>Space</kbd> or press to brace the hidden crew. Slide or use <kbd>A</kbd> / <kbd>D</kbd> to counterbalance.</p>
+        <p className="title-instruction"><strong>The Trojans pull automatically.</strong> Hold <kbd>Space</kbd> or press to brace the hidden crew; release for full speed. Slide or use <kbd>A</kbd> / <kbd>D</kbd> to counterbalance.</p>
         <p className="title-credit-mobile">
           <span>Built by Ayush</span>
           <span aria-hidden="true">·</span>
