@@ -21,8 +21,11 @@ export class RunSimulation {
   private pitch = 0
   private pitchVelocity = 0
   private balance = 0
+  private balanceTarget = 0
   private tension = 0.12
-  private heaveLoad = 0
+  private braceLoad = 0
+  private pullEffort = 0.2
+  private noisePct = 0
   private conditionPct = 100
   private suspicionPct = 0
   private inspectionIndex = -1
@@ -43,31 +46,40 @@ export class RunSimulation {
 
     const dt = FIXED_STEP_SECONDS
     this.elapsedMs += dt * 1_000
-    this.balance = Math.max(-1, Math.min(1, input.balance))
+    this.balanceTarget = Math.max(-1, Math.min(1, input.balance))
+    this.braceLoad = input.brace
+      ? Math.min(1, this.braceLoad + dt / 0.24)
+      : Math.max(0, this.braceLoad - dt / 0.16)
+    const balanceResponse = input.brace ? 0.82 : 4.2
+    this.balance += (this.balanceTarget - this.balance) * Math.min(1, dt * balanceResponse)
 
     const terrain = sampleTerrain(this.progressM, this.course)
     const act = getAct(this.progressM)
-    const maxSpeed = act === "gate" ? 1.72 : act === "inspection" ? 1.86 : 1.96
-    this.heaveLoad = input.heave
-      ? Math.min(1, this.heaveLoad + dt / 0.32)
-      : Math.max(0, this.heaveLoad - dt / 0.18)
-    const pullForce = input.heave ? this.heaveLoad * (2.78 - terrain.slope * 2.05) : 0
-    const brakeForce = input.heave ? 0.14 : this.progressM > 97 ? 1.65 : 2.75
-    const acceleration = pullForce - brakeForce - terrain.slope * 0.8 - this.velocity * 0.17
-    this.velocity = Math.max(0, Math.min(maxSpeed, this.velocity + acceleration * dt))
+    const cruiseSpeed = act === "pull" ? 1.72 : act === "inspection" ? 1.66 : 1.56
+    const gateRatio = Math.max(0, Math.min(1, (this.progressM - 89) / 10))
+    let targetSpeed = cruiseSpeed + (0.82 - cruiseSpeed) * gateRatio
+    if (this.inspectionPhase === "telegraph") targetSpeed = Math.min(targetSpeed, 0.38)
+    if (this.inspectionPhase === "active") targetSpeed = Math.min(targetSpeed, 0.06)
+    const acceleration = (targetSpeed - this.velocity) * 2.15 - terrain.slope * 0.12
+    this.velocity = Math.max(0, Math.min(1.82, this.velocity + acceleration * dt))
     this.progressM = Math.min(TRACK_LENGTH_M, this.progressM + this.velocity * dt)
 
-    const desiredPitch = terrain.roughness * 12.8 + terrain.slope * 18 + this.balance * 16 + acceleration * 0.9
-    const stability = this.config.modifierMask & 1 ? 7.8 : 6.1
-    const damping = this.config.modifierMask & 1 ? 4.3 : 3.5
+    const desiredPitch = terrain.roughness * 12.8 + terrain.slope * 18 + this.balance * 17 + acceleration * 0.72
+    const stability = (this.config.modifierMask & 1 ? 7.8 : 6.1) + this.braceLoad * 2.6
+    const damping = (this.config.modifierMask & 1 ? 4.3 : 3.5) + this.braceLoad * 2.2
     this.pitchVelocity += ((desiredPitch - this.pitch) * stability - this.pitchVelocity * damping) * dt
     this.pitch += this.pitchVelocity * dt
 
-    const tensionTarget = input.heave
-      ? 0.27 + this.heaveLoad * 0.16 + terrain.slope * 1.65 + Math.abs(this.pitch) * 0.015 + (1 - this.velocity / maxSpeed) * 0.24
-      : 0.08
-    this.tension += (tensionTarget - this.tension) * Math.min(1, dt * (input.heave ? 2.4 : 5.2))
+    this.pullEffort = Math.max(0.18, Math.min(1,
+      0.3 + terrain.slope * 1.35 + Math.max(0, targetSpeed - this.velocity) * 0.28 + Math.abs(this.pitch) * 0.012,
+    ))
+    const tensionTarget = 0.18 + this.pullEffort * 0.48 + Math.abs(this.pitch) * 0.01 - this.braceLoad * 0.035
+    this.tension += (tensionTarget - this.tension) * Math.min(1, dt * 2.8)
     this.tension = Math.max(0, Math.min(1.05, this.tension))
+
+    const balanceMovement = Math.abs(this.balanceTarget - this.balance)
+    const rawNoise = Math.abs(this.pitch) * 1.35 + Math.abs(this.balance) * 20 + balanceMovement * 42 + (1 - this.braceLoad) * 26
+    this.noisePct += (Math.max(0, Math.min(100, rawNoise)) - this.noisePct) * Math.min(1, dt * 5)
 
     if (Math.abs(this.pitch) > 19) {
       this.conditionPct = Math.max(0, this.conditionPct - (Math.abs(this.pitch) - 18) * dt * 0.48)
@@ -106,11 +118,12 @@ export class RunSimulation {
     }
 
     if (this.inspectionPhase === "active") {
-      const movement = Math.max(0, this.velocity - 0.18) * 15
+      const movement = Math.max(0, this.velocity - 0.12) * 14
       const wobble = Math.max(0, Math.abs(this.pitch) - 4) * 0.95
       const weightNoise = Math.max(0, Math.abs(this.balance) - 0.18) * 11
-      const heaveNoise = input.heave ? 9 : 0
-      const exposure = movement + wobble + weightNoise + heaveNoise
+      const shiftingNoise = Math.abs(this.balanceTarget - this.balance) * 18
+      const unbracedNoise = (1 - this.braceLoad) * 17
+      const exposure = movement + wobble + weightNoise + shiftingNoise + unbracedNoise
       const practiceGrace = this.config.mode === "practice" && this.inspectionIndex === 0 ? 0 : 1
       this.suspicionPct = Math.min(100, this.suspicionPct + exposure * (dtMs / 1_000) * practiceGrace)
 
@@ -122,7 +135,7 @@ export class RunSimulation {
   }
 
   private updateFailures(dt: number) {
-    const rolloverLimit = this.config.modifierMask & 1 ? 38 : 32
+    const rolloverLimit = this.config.modifierMask & 1 ? 38 : 30
     this.rolloverTimer = Math.abs(this.pitch) > rolloverLimit ? this.rolloverTimer + dt : Math.max(0, this.rolloverTimer - dt * 2)
     this.tensionTimer = this.tension > 0.97 ? this.tensionTimer + dt : Math.max(0, this.tensionTimer - dt * 2)
 
@@ -177,7 +190,9 @@ export class RunSimulation {
       distanceM: Math.max(0, TRACK_LENGTH_M - this.progressM),
       velocity: this.velocity,
       gateSafeSpeed: GATE_SAFE_SPEED,
-      heaveLoad: this.heaveLoad,
+      braceLoad: this.braceLoad,
+      pullEffort: this.pullEffort,
+      noisePct: this.noisePct,
       terrainRoughness: terrain.roughness,
       terrainSlope: terrain.slope,
       pitch: this.pitch,

@@ -43,9 +43,9 @@ export function PauseOverlay({ onResume, onRetry, onTitle }: PauseOverlayProps) 
         <BrandMark compact />
         <p className="section-label">SIEGE PAUSED</p>
         <h2 id="pause-title">The Trojans are pretending this is normal.</h2>
-        <p>Release the horse, center the Greeks, and take a breath.</p>
+        <p>Center the hidden crew, hold them still, and take a breath.</p>
         <div className="pause-actions">
-          <GameButton variant="primary" onClick={onResume}>RESUME THE PULL</GameButton>
+          <GameButton variant="primary" onClick={onResume}>RESUME INFILTRATION</GameButton>
           <GameButton variant="quiet" onClick={onRetry}>RESTART THIS SIEGE</GameButton>
           <button className="back-link" onClick={onTitle}>Back to title</button>
         </div>

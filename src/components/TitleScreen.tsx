@@ -25,8 +25,8 @@ export function TitleScreen(props: TitleScreenProps) {
   return (
     <main className="title-screen">
       <picture className="scene-background" aria-hidden="true">
-        <source media="(orientation: portrait)" srcSet="/assets/art/troy-road-portrait.webp" />
-        <img src="/assets/art/troy-road-desktop.webp" alt="" />
+        <source media="(orientation: portrait)" srcSet="/assets/art/troy-road-portrait-crowd.webp" />
+        <img src="/assets/art/troy-road-desktop-crowd.webp" alt="" />
       </picture>
       <div className="scene-vignette" aria-hidden="true" />
       <img className="title-horse" src="/assets/art/horse.webp" alt="A giant wooden horse on wheels" />
@@ -39,11 +39,11 @@ export function TitleScreen(props: TitleScreenProps) {
           <p className="duel-target">BEAT {props.config.targetScore?.toLocaleString()} <span>· SAME SIEGE</span></p>
         ) : null}
         <GameButton variant="primary" className="begin-button" onClick={props.onBegin}>
-          {isDuel ? "ACCEPT THE CHALLENGE" : "BEGIN THE PULL"}
+          {isDuel ? "ACCEPT THE CHALLENGE" : "BEGIN THE INFILTRATION"}
         </GameButton>
-        <p className="title-instruction">Hold to heave. Slide or use <kbd>A</kbd> / <kbd>D</kbd> to balance. Release to brake.</p>
+        <p className="title-instruction"><strong>The Trojans pull automatically.</strong> Hold <kbd>Space</kbd> or press to brace the hidden crew. Slide or use <kbd>A</kbd> / <kbd>D</kbd> to counterbalance.</p>
         <p className="title-credit-mobile">
-          <a href="https://ayushdev.com/" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "title_mobile" })}>Built by Ayush</a>
+          <span>Built by Ayush</span>
           <span aria-hidden="true">·</span>
           <a href="https://github.com/ayushhagarwal/troy-hard" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "title_mobile_github" })}>GitHub</a>
         </p>
@@ -53,7 +53,7 @@ export function TitleScreen(props: TitleScreenProps) {
         <GameButton variant="quiet" onClick={props.onSettings}><SettingsIcon />ACCESSIBILITY</GameButton>
         <span className="daily-label">{isDuel ? "FRIEND'S SIEGE" : `TODAY'S SIEGE  ·  ${utcDateLabel()}`}</span>
         <GameButton variant="quiet" onClick={props.onPractice}>PRACTICE</GameButton>
-        <a href="https://ayushdev.com/" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "title" })}>Built by Ayush</a>
+        <span>Built by Ayush</span>
         <a href="https://github.com/ayushhagarwal/troy-hard" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "title_github" })}>GitHub</a>
       </nav>
     </main>

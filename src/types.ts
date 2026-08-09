@@ -46,7 +46,7 @@ export interface LocalProfile {
 }
 
 export interface InputFrame {
-  heave: boolean
+  brace: boolean
   balance: number
 }
 
@@ -63,7 +63,9 @@ export interface SimulationSnapshot {
   distanceM: number
   velocity: number
   gateSafeSpeed: number
-  heaveLoad: number
+  braceLoad: number
+  pullEffort: number
+  noisePct: number
   terrainRoughness: number
   terrainSlope: number
   pitch: number

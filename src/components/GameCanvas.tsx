@@ -8,8 +8,8 @@ interface GameCanvasProps {
   restartSignal: number
   onSnapshot(snapshot: SimulationSnapshot): void
   onFinish(result: RunResult): void
-  onHeave(): void
-  onBrake(): void
+  onBrace(): void
+  onRelease(): void
   onInspect(): void
   onTensionCritical(): void
   onPauseChange(paused: boolean): void
@@ -50,8 +50,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(function
         callbacks: {
           onSnapshot: (snapshot) => callbacksRef.current.onSnapshot(snapshot),
           onFinish: (result) => callbacksRef.current.onFinish(result),
-          onHeave: () => callbacksRef.current.onHeave(),
-          onBrake: () => callbacksRef.current.onBrake(),
+          onBrace: () => callbacksRef.current.onBrace(),
+          onRelease: () => callbacksRef.current.onRelease(),
           onInspect: () => callbacksRef.current.onInspect(),
           onTensionCritical: () => callbacksRef.current.onTensionCritical(),
           onPauseChange: (paused) => callbacksRef.current.onPauseChange(paused),

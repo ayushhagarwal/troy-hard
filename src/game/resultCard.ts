@@ -68,7 +68,7 @@ async function renderResultCardOnMainThread(result: RunResult): Promise<Blob> {
   context.fillText("SAME SIEGE. BETTER SCORE.", 650, 478)
   context.fillStyle = "#d6ae70"
   context.font = "500 24px 'IBM Plex Mono', monospace"
-  context.fillText("troyhard.ayushdev.com", 650, 530)
+  context.fillText("TROY HARD · SAME SIEGE", 650, 530)
   context.fillStyle = "rgba(241,223,192,.7)"
   context.font = "500 18px Archivo, sans-serif"
   context.fillText("Built by Ayush · An independent game based on ancient mythology", 650, 573)

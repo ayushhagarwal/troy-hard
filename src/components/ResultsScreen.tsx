@@ -68,7 +68,7 @@ export function ResultsScreen({ result, priorBest, onRetry, onTitle }: ResultsSc
               : result.config.targetSuspicionPct !== undefined && result.suspicionPct > result.config.targetSuspicionPct
                 ? "LOST ON STEALTH"
                 : "EXACT TIE"
-  const origin = typeof window === "undefined" ? "https://troyhard.ayushdev.com" : window.location.origin
+  const origin = typeof window === "undefined" ? "https://troy-hard-ayushhagarwals-projects.vercel.app" : window.location.origin
   const challengeUrl = useMemo(() => buildChallengeURL(result, origin), [origin, result])
 
   useEffect(() => {
@@ -136,7 +136,7 @@ export function ResultsScreen({ result, priorBest, onRetry, onTitle }: ResultsSc
           </div>
           {card ? <button className="download-link" onClick={() => { downloadCard(card); trackGameEvent("share_handoff", { channel: "download", asset: "image" }) }}>Download score card</button> : null}
           <button className="back-link" onClick={onTitle}>Back to title</button>
-          <p className="result-credit"><a href="https://ayushdev.com/" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "results" })}>Built by Ayush</a><span>·</span><a href="https://github.com/ayushhagarwal/troy-hard" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "results_github" })}>GitHub</a></p>
+          <p className="result-credit"><span>Built by Ayush</span><span>·</span><a href="https://github.com/ayushhagarwal/troy-hard" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "results_github" })}>GitHub</a></p>
         </div>
         {notice ? <p className="share-notice" role="status">{notice}</p> : null}
       </section>

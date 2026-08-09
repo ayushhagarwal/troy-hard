@@ -29,7 +29,7 @@ export function InfoPage({ kind }: InfoPageProps) {
         <h1>{makingOf ? "A physics heist inside a wooden horse." : "Built independently. Stored locally."}</h1>
         <p className="info-lead">
           {makingOf
-            ? "TROY HARD turns one historical punchline into a tactile browser game: four Trojans pull, hidden Greeks lean, and one increasingly suspicious guard raises a torch."
+            ? "TROY HARD turns one historical punchline into a tactile browser game: four Trojans pull automatically, hidden Greeks counterbalance in silence, and increasingly suspicious guards raise their torches."
             : "TROY HARD is an independent game based on ancient mythology. It is not affiliated with any film, studio, publisher, actor, or game franchise."}
         </p>
         {makingOf ? (
@@ -43,7 +43,7 @@ export function InfoPage({ kind }: InfoPageProps) {
             <section>
               <p className="section-label">01 · THE CONSTRAINT</p>
               <h2>Explain nothing twice.</h2>
-              <p>No account, installation, modal tutorial, or upgrade tree. The first press moves the rope, the first drag shifts the weight, and releasing the same input brakes and braces. Controls retire only after the player demonstrates them.</p>
+              <p>No account, installation, modal tutorial, or upgrade tree. The Trojan crew visibly advances on its own. Holding braces the hidden Greeks, while the first drag shifts their weight against the road. The persistent control rail explains the full interaction without pausing play.</p>
             </section>
             <section>
               <p className="section-label">02 · THE PHYSICAL JOKE</p>
@@ -94,7 +94,7 @@ export function InfoPage({ kind }: InfoPageProps) {
           </>
         )}
         <footer>
-          <a href="https://ayushdev.com/" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: kind })}>Built by Ayush Agarwal</a>
+          <span>Built by Ayush Agarwal</span>
           {makingOf ? (
             <a href="/credits/">Credits & privacy</a>
           ) : (

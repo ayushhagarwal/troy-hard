@@ -3,7 +3,7 @@ import { rankForScore } from "../src/game/score"
 
 function responseHtml(origin: string, token: string, score: number, elapsedMs: number, suspicion: number) {
   const path = `/c/${token}`
-  const canonical = "https://troyhard.ayushdev.com/"
+  const canonical = `${origin}/`
   const challengeUrl = `${origin}${path}`
   const ogUrl = `${origin}/api/og/${token}`
   const title = `Beat ${score.toLocaleString("en-US")} in TROY HARD`

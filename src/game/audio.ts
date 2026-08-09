@@ -49,11 +49,6 @@ export class AudioDirector {
     this.intensity = intensity
   }
 
-  heave() {
-    this.knock(88, 0.045, 0.1, this.effects)
-    this.woodClack(0.034)
-  }
-
   sfx(kind: SoundEffect) {
     if (!this.context || !this.effects || this.context.state !== "running") return
     if (kind === "rope") {

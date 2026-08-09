@@ -14,7 +14,7 @@ function recordedRun(renderFps: number): SimulationSnapshot {
     accumulator += renderDelta
     while (accumulator + 0.00001 >= 1_000 / 60 && fixedFrames < 3_000 && !snapshot.ended) {
       const cycle = fixedFrames % 240
-      snapshot = simulation.step({ heave: cycle < 185, balance: Math.sin(fixedFrames / 80) * 0.28 })
+      snapshot = simulation.step({ brace: cycle > 155, balance: Math.sin(fixedFrames / 80) * 0.28 })
       accumulator -= 1_000 / 60
       fixedFrames += 1
     }
@@ -31,7 +31,7 @@ describe("fixed-step simulation", () => {
 
   it("requires sustained bad state and resolves a forced result", () => {
     const simulation = new RunSimulation(config)
-    const initial = simulation.step({ heave: true, balance: 1 })
+    const initial = simulation.step({ brace: false, balance: 1 })
     expect(initial.ended).toBe(false)
     expect(simulation.forceFinish("gate_crash").outcome).toBe("gate_crash")
     expect(simulation.result()?.score).toBeLessThan(5_000)

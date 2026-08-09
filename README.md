@@ -2,15 +2,15 @@
 
 **A completely ordinary delivery.**
 
-TROY HARD is a free 70–90 second physics-stealth browser game. Haul a top-heavy wooden horse toward Troy, settle the hidden Greeks during torch inspections, and cross the gate slowly enough to look like a perfectly normal gift.
+TROY HARD is a free 70–90 second physics-stealth browser game. The Trojans automatically haul a top-heavy wooden horse toward Troy; you keep the Greeks hidden inside balanced, braced, and silent during torch inspections.
 
 ![TROY HARD desktop gameplay](public/assets/making-of/gameplay-concept.webp)
 
-Play target: [troyhard.ayushdev.com](https://troyhard.ayushdev.com/) · Case study: [/making-of/](https://troyhard.ayushdev.com/making-of/) · Creator: [ayushdev.com](https://ayushdev.com/)
+Play target: [TROY HARD on Vercel](https://troy-hard-ayushhagarwals-projects.vercel.app/) · Case study: [/making-of/](https://troy-hard-ayushhagarwals-projects.vercel.app/making-of/) · Source: [GitHub](https://github.com/ayushhagarwal/troy-hard)
 
 ## Why this exists
 
-The whole game is built around one physical joke: the player controls both the people pulling the horse and the people hiding inside it. Holding loads the ropes and heaves. Sliding shifts the hidden Greeks. Releasing brakes and braces. Three escalating acts turn those two inputs into a short, replayable siege.
+The whole game is built around one physical joke: the Trojans enthusiastically deliver their own downfall while the player manages the hidden crew inside. The cart advances automatically. Holding braces the Greeks, while sliding shifts their weight to counter the road. Three escalating acts turn those two inputs into a short, replayable siege.
 
 - No sign-in, installation, player database, ads, upgrades, or forced sharing.
 - Practice, UTC daily, and same-seed friend challenge modes.
@@ -56,9 +56,9 @@ npm run build
 
 ## Controls
 
-- Hold `Space`, `W`, `↑`, or the playfield to heave.
-- Use `A`/`D`, `←`/`→`, or horizontal pointer movement to balance the hidden Greeks.
-- Release to brake and brace.
+- The Trojan pull team advances and stops automatically.
+- Hold `Space`, `W`, `↑`, or the playfield to brace the hidden Greeks and suppress noise.
+- Use `A`/`D`, `←`/`→`, or horizontal pointer movement to counterbalance the hidden crew.
 - `R` retries immediately. `Esc`/`P` pauses.
 
 Pointer cancel, tab blur, settings, and backgrounding safely release the controls and pause the simulation/audio.

@@ -4,7 +4,7 @@ import { sanitizeTelemetryEvent } from "../game/analytics"
 
 export function Telemetry() {
   const hostname = window.location.hostname
-  const enabled = hostname === "troyhard.ayushdev.com" || hostname.endsWith(".vercel.app")
+  const enabled = hostname.endsWith(".vercel.app")
   if (!enabled) return null
   return (
     <>

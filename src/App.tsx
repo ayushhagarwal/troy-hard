@@ -59,9 +59,8 @@ function GameApp() {
   const [result, setResult] = useState<RunResult | null>(null)
   const [priorBest, setPriorBest] = useState<RunResult | undefined>()
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [learnedHeave, setLearnedHeave] = useState(false)
+  const [learnedBrace, setLearnedBrace] = useState(false)
   const [learnedBalance, setLearnedBalance] = useState(false)
-  const [learnedBrake, setLearnedBrake] = useState(false)
   const [playerPaused, setPlayerPaused] = useState(false)
   const [restartSignal, setRestartSignal] = useState(0)
   const gameRef = useRef<GameCanvasHandle>(null)
@@ -195,8 +194,8 @@ function GameApp() {
               audioRef.current?.setIntensity(next.inspection.phase === "active" ? "alarm" : next.inspection.phase === "telegraph" ? "suspicion" : next.velocity > 0.15 ? "pull" : "idle")
             }}
             onFinish={finishRun}
-            onHeave={() => { setLearnedHeave(true); audioRef.current?.heave() }}
-            onBrake={() => { setLearnedBrake(true); audioRef.current?.sfx("brace") }}
+            onBrace={() => { setLearnedBrace(true); audioRef.current?.sfx("brace") }}
+            onRelease={() => undefined}
             onInspect={() => audioRef.current?.sfx("inspect")}
             onTensionCritical={() => audioRef.current?.sfx("rope")}
             onPauseChange={setPlayerPaused}
@@ -204,9 +203,8 @@ function GameApp() {
           {snapshot ? (
             <Hud
               snapshot={snapshot}
-              learnedHeave={learnedHeave}
+              learnedBrace={learnedBrace}
               learnedBalance={learnedBalance}
-              learnedBrake={learnedBrake}
               onSettings={() => setSettingsOpen(true)}
             />
           ) : <div className="loading-mark">LOADING THE HORSE…</div>}

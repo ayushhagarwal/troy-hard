@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Allow: /api/og
 
-Sitemap: https://troyhard.ayushdev.com/sitemap.xml
+Sitemap: https://troy-hard-ayushhagarwals-projects.vercel.app/sitemap.xml

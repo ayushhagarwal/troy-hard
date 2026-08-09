@@ -19,7 +19,7 @@ export default function handler(request: Request) {
   const headline = challenge ? `BEAT ${score?.toLocaleString("en-US")}` : "THE ORIGINAL HEIST."
   const subhead = challenge
     ? `${rankForScore(score ?? 0)} · ${((elapsed ?? 0) / 1_000).toFixed(1)}s · ${suspicion}% suspicion`
-    : "Hold to heave. Slide to hide the Greeks."
+    : "Trojans pull automatically. Brace. Balance. Stay quiet."
   const sceneUrl = new URL(challenge ? "/assets/art/success-freeze.webp" : "/assets/art/troy-road-desktop.webp", request.url).toString()
   const horseUrl = new URL("/assets/art/horse.webp", request.url).toString()
 

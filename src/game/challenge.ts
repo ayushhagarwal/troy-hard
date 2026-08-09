@@ -69,7 +69,7 @@ export function challengeTokenFromLocation(location: Pick<Location, "pathname" |
   return match?.[1] ?? null
 }
 
-export function buildChallengeURL(result: RunResult, origin = "https://troyhard.ayushdev.com"): string {
+export function buildChallengeURL(result: RunResult, origin = "https://troy-hard-ayushhagarwals-projects.vercel.app"): string {
   return `${origin.replace(/\/$/, "")}/c/${encodeChallenge(result)}`
 }
 
