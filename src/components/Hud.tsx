@@ -13,10 +13,18 @@ export function Hud({ snapshot, learnedBrace, learnedBalance, onSettings }: HudP
   const litSpears = Math.min(3, Math.ceil(snapshot.suspicionPct / 34))
   const ropeCritical = snapshot.tension >= 0.82
   const braced = snapshot.braceLoad >= 0.68
+  const tipping = Math.abs(snapshot.pitch) >= 8
+  const counterDirection = snapshot.pitch > 0 ? "LEFT" : "RIGHT"
   const instruction = snapshot.inspection.phase === "active" && !braced
     ? "HOLD TO BRACE · THE GUARDS CAN HEAR THEM"
+    : snapshot.inspection.phase === "active" && tipping
+      ? `HORSE TIPPING · SHIFT ${counterDirection}`
+      : snapshot.inspection.phase === "active"
+        ? "HOLD STILL · INSPECTION CLEARING"
     : ropeCritical
       ? "ROPE STRAIN · CENTER THE HIDDEN CREW"
+      : tipping
+        ? `COUNTER THE SLOPE · SHIFT ${counterDirection}`
       : !learnedBrace
         ? "HOLD SPACE OR PRESS TO BRACE"
         : !learnedBalance
@@ -41,7 +49,15 @@ export function Hud({ snapshot, learnedBrace, learnedBalance, onSettings }: HudP
         <small>{Math.round(snapshot.suspicionPct)}%</small>
       </div>
       <div className={`inspection-callout inspection-callout--${snapshot.inspection.phase}`} role="status" aria-live="polite" aria-atomic="true">
-        {snapshot.inspection.phase === "telegraph" ? "TORCH RAISED · THE TROJANS ARE STOPPING" : snapshot.inspection.phase === "active" ? "INSPECTION · KEEP THE HIDDEN CREW STILL" : ""}
+        {snapshot.inspection.phase === "telegraph"
+          ? "TORCH RAISED · THE TROJANS ARE STOPPING"
+          : snapshot.inspection.phase === "active" && !braced
+            ? "INSPECTION · BRACE THE HIDDEN CREW"
+            : snapshot.inspection.phase === "active" && tipping
+              ? "INSPECTION · LEVEL THE HORSE"
+              : snapshot.inspection.phase === "active"
+                ? "INSPECTION · DO NOT MOVE"
+                : ""}
       </div>
       <div className="condition-meter" aria-label={`Horse condition ${Math.round(snapshot.conditionPct)} percent`}>
         <span>HORSE</span><b style={{ transform: `scaleX(${snapshot.conditionPct / 100})` }} />
@@ -57,9 +73,9 @@ export function Hud({ snapshot, learnedBrace, learnedBalance, onSettings }: HudP
           <small>SAFE BELOW {snapshot.gateSafeSpeed.toFixed(2)}</small>
         </div>
       ) : null}
-      {instruction ? <p className={`hud-instruction ${ropeCritical ? "is-danger" : ""}`}>{instruction}</p> : null}
+      {instruction ? <p className={`hud-instruction ${ropeCritical || tipping || snapshot.inspection.phase === "active" ? "is-danger" : ""}`}>{instruction}</p> : null}
       <div className={`control-guide ${braced ? "is-braced" : ""}`} aria-label={`The Trojans pull automatically. Hidden crew ${braced ? "braced and quiet" : "loose"}. Noise ${Math.round(snapshot.noisePct)} percent.`}>
-        <span>TROJANS PULL AUTOMATICALLY <i aria-hidden="true">→ GATE</i></span>
+        <span>TROJANS PULL <i aria-hidden="true">→ UPHILL INTO THE GATE</i></span>
         <strong>{braced ? "BRACING · QUIET" : "HOLD SPACE / PRESS · BRACE"}</strong>
         <small>SLIDE OR A / D · SHIFT HIDDEN CREW <b>{Math.round(snapshot.noisePct)}% NOISE</b></small>
       </div>

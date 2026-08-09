@@ -59,12 +59,14 @@ export class RunSimulation {
     const gateRatio = Math.max(0, Math.min(1, (this.progressM - 89) / 10))
     let targetSpeed = cruiseSpeed + (0.82 - cruiseSpeed) * gateRatio
     if (this.inspectionPhase === "telegraph") targetSpeed = Math.min(targetSpeed, 0.38)
-    if (this.inspectionPhase === "active") targetSpeed = Math.min(targetSpeed, 0.06)
+    // The Trojans stop the cart for an inspection. The run only resumes once
+    // the hidden crew has actively braced and settled the load.
+    if (this.inspectionPhase === "active") targetSpeed = Math.min(targetSpeed, 0.015)
     const acceleration = (targetSpeed - this.velocity) * 2.15 - terrain.slope * 0.12
     this.velocity = Math.max(0, Math.min(1.82, this.velocity + acceleration * dt))
     this.progressM = Math.min(TRACK_LENGTH_M, this.progressM + this.velocity * dt)
 
-    const desiredPitch = terrain.roughness * 12.8 + terrain.slope * 18 + this.balance * 17 + acceleration * 0.72
+    const desiredPitch = terrain.roughness * 13.2 + terrain.slope * 18 + this.balance * 17 + acceleration * 0.72
     const stability = (this.config.modifierMask & 1 ? 7.8 : 6.1) + this.braceLoad * 2.6
     const damping = (this.config.modifierMask & 1 ? 4.3 : 3.5) + this.braceLoad * 2.2
     this.pitchVelocity += ((desiredPitch - this.pitch) * stability - this.pitchVelocity * damping) * dt
@@ -121,13 +123,24 @@ export class RunSimulation {
       const movement = Math.max(0, this.velocity - 0.12) * 14
       const wobble = Math.max(0, Math.abs(this.pitch) - 4) * 0.95
       const weightNoise = Math.max(0, Math.abs(this.balance) - 0.18) * 11
-      const shiftingNoise = Math.abs(this.balanceTarget - this.balance) * 18
-      const unbracedNoise = (1 - this.braceLoad) * 17
+      const shiftingNoise = Math.abs(this.balanceTarget - this.balance) * 22
+      const unbracedNoise = (1 - this.braceLoad) * 24
       const exposure = movement + wobble + weightNoise + shiftingNoise + unbracedNoise
-      const practiceGrace = this.config.mode === "practice" && this.inspectionIndex === 0 ? 0 : 1
+      const firstPracticeInspection = this.config.mode === "practice" && this.inspectionIndex === 0
+      const practiceGrace = firstPracticeInspection ? 0.3 : 1
       this.suspicionPct = Math.min(100, this.suspicionPct + exposure * (dtMs / 1_000) * practiceGrace)
 
-      if (this.inspectionTimerMs >= point.activeMs) {
+      const settled = input.brace
+        && this.braceLoad >= 0.66
+        && Math.abs(this.pitch) <= 9
+        && Math.abs(this.pitchVelocity) <= 3.5
+        && Math.abs(this.balanceTarget - this.balance) <= 0.16
+      // Practice demonstrates the checkpoint once without trapping a new
+      // player. Every later inspection remains stopped until they do it right.
+      const practiceDemonstrationComplete = firstPracticeInspection
+        && this.inspectionTimerMs >= point.activeMs + 1_750
+
+      if (this.inspectionTimerMs >= point.activeMs && (settled || practiceDemonstrationComplete)) {
         this.inspectionPhase = "idle"
         this.inspectionTimerMs = 0
       }

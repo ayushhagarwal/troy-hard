@@ -251,12 +251,22 @@ class TroyScene extends Phaser.Scene {
   private updateVisuals(snapshot: SimulationSnapshot) {
     const width = this.scale.width
     const height = this.scale.height
-    const ratio = snapshot.progressM / 100
+    const ratio = Phaser.Math.Clamp(snapshot.progressM / 100, 0, 1)
+    const depth = Math.pow(ratio, 0.82)
     const portrait = this.isPortrait()
-    const horseX = portrait ? width * (0.48 + ratio * 0.02) : width * (0.18 + ratio * 0.45)
-    const horseY = portrait ? height * (0.72 - ratio * 0.27) : height * (0.76 - ratio * 0.16)
-    const horseScale = portrait ? width / 1_350 : Math.min(width / 2_750, height / 1_720)
-    const pullerScale = horseScale * (portrait ? 0.68 : 0.72)
+    // Follow the road's perspective all the way into the open gate. Both the
+    // shrinking scale and rising ground line make the destination unambiguous.
+    const horseX = portrait
+      ? Phaser.Math.Linear(width * 0.3, width * 0.43, depth)
+      : Phaser.Math.Linear(width * 0.19, width * 0.69, depth)
+    const horseY = portrait
+      ? Phaser.Math.Linear(height * 0.79, height * 0.54, depth)
+      : Phaser.Math.Linear(height * 0.79, height * 0.55, depth)
+    const baseHorseScale = portrait ? width / 1_350 : Math.min(width / 2_750, height / 1_720)
+    const perspectiveScale = Phaser.Math.Linear(portrait ? 1.02 : 1.04, portrait ? 0.58 : 0.62, depth)
+    const horseScale = baseHorseScale * perspectiveScale
+    const pullerScale = horseScale * (portrait ? 0.72 : 0.7)
+    const routeAngle = Phaser.Math.Linear(portrait ? -8 : -7, portrait ? -4 : -3, depth)
     const motionAllowed = !this.options.settings.reducedMotion
     const roughBob = motionAllowed ? Math.sin(this.time.now * 0.021) * snapshot.terrainRoughness * 2.8 : 0
     const pullBob = motionAllowed && snapshot.velocity > 0.08
@@ -264,38 +274,53 @@ class TroyScene extends Phaser.Scene {
       : 0
 
     const source = this.background.texture.getSourceImage() as HTMLImageElement
-    const coverScale = Math.max(width / source.width, height / source.height) * (1.015 + ratio * 0.012)
+    const coverScale = Math.max(width / source.width, height / source.height) * (1.015 + ratio * 0.006)
     this.background
       .setScale(coverScale)
-      .setPosition(width / 2 - (portrait ? 0 : ratio * width * 0.025), height / 2 - (portrait ? ratio * height * 0.012 : 0))
+      .setPosition(width / 2, height / 2)
     const actShade = snapshot.act === "gate" ? 0.16 : snapshot.act === "inspection" ? 0.11 : 0.075
     this.shade.setFillStyle(snapshot.inspection.phase === "active" ? 0x3a1711 : 0x171310, snapshot.inspection.phase === "active" ? 0.22 : actShade)
 
-    this.horse.setPosition(horseX, horseY + roughBob).setScale(horseScale).setAngle(snapshot.pitch)
-    this.truthHorse.setPosition(this.horse.x, this.horse.y).setScale(horseScale).setAngle(snapshot.pitch)
+    const visualAngle = routeAngle + snapshot.pitch
+    this.horse.setPosition(horseX, horseY + roughBob).setScale(horseScale).setAngle(visualAngle)
+    this.truthHorse.setPosition(this.horse.x, this.horse.y).setScale(horseScale).setAngle(visualAngle)
 
-    const pullerCenterX = portrait ? horseX + width * 0.21 : horseX + width * 0.255
-    const pullerCenterY = portrait ? horseY + height * 0.105 : horseY + height * 0.095
+    const pullerOffsetX = portrait
+      ? Phaser.Math.Linear(width * 0.26, width * 0.16, depth)
+      : Phaser.Math.Linear(width * 0.21, width * 0.115, depth)
+    const pullerOffsetY = portrait
+      ? Phaser.Math.Linear(-height * 0.055, -height * 0.035, depth)
+      : Phaser.Math.Linear(-height * 0.045, -height * 0.025, depth)
+    const pullerCenterX = horseX + pullerOffsetX
+    const pullerCenterY = horseY + pullerOffsetY
     const stride = motionAllowed && snapshot.velocity > 0.08 ? Math.sin(this.time.now * 0.013) * Math.min(5, snapshot.velocity * 3.4) : 0
     this.pullTeam
       .setPosition(pullerCenterX + stride, pullerCenterY + pullBob)
       .setScale(pullerScale)
-      .setAngle(snapshot.pitch * 0.04 - snapshot.pullEffort * 1.25)
+      .setAngle(routeAngle * 0.85 + snapshot.pitch * 0.04 - snapshot.pullEffort * 0.7)
       .setAlpha(snapshot.inspection.phase === "active" ? 0.92 : 1)
 
-    this.drawRope(horseX, horseY, horseScale, pullerCenterX, pullerCenterY, snapshot)
-    this.placeWheels(horseX, horseY + roughBob, horseScale, snapshot.pitch, snapshot.progressM)
+    this.drawRope(horseX, horseY, horseScale, pullerCenterX, pullerCenterY, pullerScale, snapshot)
+    this.placeWheels(horseX, horseY + roughBob, horseScale, visualAngle, snapshot.progressM)
     this.updateInspection(horseX, horseY, horseScale, snapshot)
     this.drawDust(horseX, horseY, horseScale, snapshot.velocity, snapshot.terrainRoughness)
     this.drawBalanceGlyph(width, height, snapshot.balance, snapshot.pitch)
   }
 
-  private drawRope(horseX: number, horseY: number, horseScale: number, pullerX: number, pullerY: number, snapshot: SimulationSnapshot) {
+  private drawRope(
+    horseX: number,
+    horseY: number,
+    horseScale: number,
+    pullerX: number,
+    pullerY: number,
+    pullerScale: number,
+    snapshot: SimulationSnapshot,
+  ) {
     this.rope.clear()
     const startX = horseX + 390 * horseScale
     const startY = horseY - 185 * horseScale
-    const endX = pullerX - 530 * horseScale * 0.72
-    const endY = pullerY - 315 * horseScale * 0.72
+    const endX = pullerX - 530 * pullerScale
+    const endY = pullerY - 315 * pullerScale
     const tension = Phaser.Math.Clamp(snapshot.tension, 0, 1)
     const color = tension >= 0.84 ? 0xe35c38 : tension >= 0.68 ? 0xd6ae70 : 0x704329
     this.rope.lineStyle(Math.max(2, 7 * horseScale), color, 0.98)
