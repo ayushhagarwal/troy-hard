@@ -95,7 +95,11 @@ export function InfoPage({ kind }: InfoPageProps) {
         )}
         <footer>
           <a href="https://ayushdev.com/" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: kind })}>Built by Ayush Agarwal</a>
-          <a href={makingOf ? "/credits/" : "/making-of/"}>{makingOf ? "Credits & privacy" : "Read the making-of"}</a>
+          {makingOf ? (
+            <a href="/credits/">Credits & privacy</a>
+          ) : (
+            <a href="https://github.com/ayushhagarwal/troy-hard" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "credits_github" })}>GitHub</a>
+          )}
         </footer>
       </article>
     </main>

@@ -45,7 +45,7 @@ export function TitleScreen(props: TitleScreenProps) {
         <p className="title-credit-mobile">
           <a href="https://ayushdev.com/" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "title_mobile" })}>Built by Ayush</a>
           <span aria-hidden="true">·</span>
-          <a href="/making-of/">Making of</a>
+          <a href="https://github.com/ayushhagarwal/troy-hard" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "title_mobile_github" })}>GitHub</a>
         </p>
       </section>
       <nav className="title-utilities" aria-label="Game options">
@@ -54,7 +54,7 @@ export function TitleScreen(props: TitleScreenProps) {
         <span className="daily-label">{isDuel ? "FRIEND'S SIEGE" : `TODAY'S SIEGE  ·  ${utcDateLabel()}`}</span>
         <GameButton variant="quiet" onClick={props.onPractice}>PRACTICE</GameButton>
         <a href="https://ayushdev.com/" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "title" })}>Built by Ayush</a>
-        <a href="/making-of/">How it was made</a>
+        <a href="https://github.com/ayushhagarwal/troy-hard" target="_blank" rel="noopener noreferrer" onClick={() => trackGameEvent("creator_click", { surface: "title_github" })}>GitHub</a>
       </nav>
     </main>
   )
