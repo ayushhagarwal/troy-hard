@@ -2,8 +2,6 @@ import { ImageResponse } from "@vercel/og"
 import { decodeChallenge } from "../src/game/challenge"
 import { rankForScore } from "../src/game/score"
 
-export const config = { runtime: "edge" }
-
 export default function handler(request: Request) {
   if (request.method !== "GET" && request.method !== "HEAD") {
     return new Response("Method not allowed", { status: 405, headers: { Allow: "GET, HEAD" } })
